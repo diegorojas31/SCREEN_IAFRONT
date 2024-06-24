@@ -1,12 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
-// useCallback
 import { useDropzone } from "react-dropzone";
-// import { PromptImage } from "../../../types";
 import { toast } from "react-hot-toast";
-import { URLS } from "../urls";
-import { Badge } from "./ui/badge";
-import ScreenRecorder from "./recording/ScreenRecorder";
-import { ScreenRecorderState } from "../types";
 
 const baseStyle = {
   flex: 1,
@@ -57,15 +51,12 @@ type FileWithPreview = {
 interface Props {
   setReferenceImages: (
     referenceImages: string[],
-    inputMode: "image" | "video"
+    inputMode: "image"
   ) => void;
 }
 
 function ImageUpload({ setReferenceImages }: Props) {
   const [files, setFiles] = useState<FileWithPreview[]>([]);
-  // TODO: Switch to Zustand
-  const [screenRecorderState, setScreenRecorderState] =
-    useState<ScreenRecorderState>(ScreenRecorderState.INITIAL);
 
   const { getRootProps, getInputProps, isFocused, isDragAccept, isDragReject } =
     useDropzone({
@@ -97,9 +88,7 @@ function ImageUpload({ setReferenceImages }: Props) {
             if (dataUrls.length > 0) {
               setReferenceImages(
                 dataUrls.map((dataUrl) => dataUrl as string),
-                (dataUrls[0] as string).startsWith("data:video")
-                  ? "video"
-                  : "image"
+                'image'
               );
             }
           })
@@ -112,40 +101,6 @@ function ImageUpload({ setReferenceImages }: Props) {
         toast.error(rejectedFiles[0].errors[0].message);
       },
     });
-
-  // const pasteEvent = useCallback(
-  //   (event: ClipboardEvent) => {
-  //     const clipboardData = event.clipboardData;
-  //     if (!clipboardData) return;
-
-  //     const items = clipboardData.items;
-  //     const files = [];
-  //     for (let i = 0; i < items.length; i++) {
-  //       const file = items[i].getAsFile();
-  //       if (file && file.type.startsWith("image/")) {
-  //         files.push(file);
-  //       }
-  //     }
-
-  //     // Convert images to data URLs and set the prompt images state
-  //     Promise.all(files.map((file) => fileToDataURL(file)))
-  //       .then((dataUrls) => {
-  //         if (dataUrls.length > 0) {
-  //           setReferenceImages(dataUrls.map((dataUrl) => dataUrl as string));
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         // TODO: Display error to user
-  //         console.error("Error reading files:", error);
-  //       });
-  //   },
-  //   [setReferenceImages]
-  // );
-
-  // TODO: Make sure we don't listen to paste events in text input components
-  // useEffect(() => {
-  //   window.addEventListener("paste", pasteEvent);
-  // }, [pasteEvent]);
 
   useEffect(() => {
     return () => files.forEach((file) => URL.revokeObjectURL(file.preview));
@@ -163,8 +118,6 @@ function ImageUpload({ setReferenceImages }: Props) {
 
   return (
     <section className="container">
-      {screenRecorderState === ScreenRecorderState.INITIAL && (
-        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         <div {...getRootProps({ style: style as any })}>
           <input {...getInputProps()} />
           <p className="text-slate-700 text-lg">
@@ -172,25 +125,6 @@ function ImageUpload({ setReferenceImages }: Props) {
             or click to upload
           </p>
         </div>
-      )}
-      {screenRecorderState === ScreenRecorderState.INITIAL && (
-        <div className="text-center text-sm text-slate-800 mt-4">
-          <Badge>New!</Badge> Upload a screen recording (.mp4, .mov) or record
-          your screen to clone a whole app (experimental).{" "}
-          <a
-            className="underline"
-            href={URLS["intro-to-video"]}
-            target="_blank"
-          >
-            Learn more.
-          </a>
-        </div>
-      )}
-      <ScreenRecorder
-        screenRecorderState={screenRecorderState}
-        setScreenRecorderState={setScreenRecorderState}
-        generateCode={setReferenceImages}
-      />
     </section>
   );
 }
