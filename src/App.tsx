@@ -337,7 +337,7 @@ export const App = () => {
         <div className="lg:fixed lg:inset-y-0 lg:z-40 lg:flex lg:w-96 lg:flex-col">
           <div className="flex-grow flex flex-col gap-y-2 overflow-y-auto border-r border-gray-200 px-6 dark:bg-purple-900 dark:text-white text-white pb-10" style={{ background: 'linear-gradient(to bottom, #4b4b8f, #757abf)' }}>
             <div className="flex items-center justify-between mt-10 mb-2">
-              <h1 className="text-2xl ">Screenshot to Code</h1>
+              <h1 className="text-2xl ">Mockup Vision</h1>
             </div>
 
             <OutputSettingsSection

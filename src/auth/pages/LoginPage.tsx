@@ -1,12 +1,13 @@
 import { FormEvent, useState } from "react";
-
-import { TextField, Button, Typography, Link, InputAdornment, IconButton, FormControl, Box  } from '@mui/material';
+import { useNavigate } from "react-router-dom";
+import { TextField, Button, Typography, Link, InputAdornment, IconButton, FormControl, Box, Alert, Checkbox, FormControlLabel  } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LockIcon from '@mui/icons-material/Lock';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { AuthLayout } from "../layout/AuthLayout";
-import { useNavigate } from "react-router-dom";
+
+import { Users } from "../helper/data";
 
 const imageUrl = '/assets/dream_TradingCard.jpg'
 
@@ -16,7 +17,11 @@ export const LoginPage = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [error, setError] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<boolean>(false);
+
+  const [acceptPrivacyPolicy, setAcceptPrivacyPolicy] = useState<boolean>(false);
+  const [acceptTerms, setAcceptTerms] = useState<boolean>(false);
 
   const handleTogglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -24,15 +29,36 @@ export const LoginPage = () => {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setError(null);
+    setSuccess(false);
 
     if (!email || !password) {
-      setError(true);
+      setError("Por favor, complete todos los campos.");
       return;
     }
-    // Aquí puedes agregar lógica para manejar el envío del formulario
-    // Por ejemplo, realizar una petición POST al backend
-    console.log(email, password);
-    navigate('/');
+
+    if (!acceptPrivacyPolicy || !acceptTerms) {
+      setError("Debes aceptar nuestros términos y condiciones y políticas de privacidad.");
+      return;
+    }
+
+    const user = Users.find(user => user.email === email && user.password === password);
+
+    if (user) {
+      if (!user.existsInDB) {
+        setError("El usuario no existe o la cuenta no existe.");
+      } else {
+        setSuccess(true);
+        setTimeout(() => {
+          navigate('/generate-code');
+        }, 1000);
+      }
+    } else {
+      console.log(email, password); // Para otros correos y contraseñas no estáticos
+      setTimeout(() => {
+        navigate('/generate-code');
+      }, 1000);
+    }
   };
 
   return (
@@ -47,7 +73,9 @@ export const LoginPage = () => {
         <Typography variant="h6" sx={{ mb: 2, color: '#FEFCFB' }}>
           Iniciar sesión
         </Typography>
-        <FormControl fullWidth error={error} sx={{ mb: 2 }}>
+        {error && <Alert severity="error" sx={{mb: 2}}>{error}</Alert>}
+        {success && <Alert severity="success" sx={{mb: 2}}>Inicio de sesión exitoso.</Alert>}
+        <FormControl fullWidth sx={{ mb: 2 }}>
           <TextField
             label="Usuario o correo electrónico"
             variant="outlined"
@@ -62,13 +90,13 @@ export const LoginPage = () => {
                 </InputAdornment>
               ),
               style: {
-                borderRadius: '4px', // Bordes redondeados para el input
-                color: '#FEFCFB' // Texto blanco para contraste
+                borderRadius: '4px',
+                color: '#FEFCFB'
               }
             }}
           />
         </FormControl>
-        <FormControl fullWidth error={error} sx={{ mb: 2 }}>
+        <FormControl fullWidth sx={{ mb: 2 }}>
           <TextField
             label="Contraseña"
             type={showPassword ? 'text' : 'password'}
@@ -94,22 +122,52 @@ export const LoginPage = () => {
                 </InputAdornment>
               ),
               style: {
-                borderRadius: '4px', // Bordes redondeados para el input
-                color: '#FEFCFB' // Texto blanco para contraste
+                borderRadius: '4px',
+                color: '#FEFCFB'
               }
             }}
           />
         </FormControl>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={acceptPrivacyPolicy}
+              onChange={(e) => setAcceptPrivacyPolicy(e.target.checked)}
+              color="secondary"
+            />
+          }
+          label={
+            <Typography variant="body2" color="#FEFCFB">
+              Acepto las <Link href="/privacy-policy" color="inherit">políticas de privacidad</Link>
+            </Typography>
+          }
+          sx={{ mb: 2 }}
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={acceptTerms}
+              onChange={(e) => setAcceptTerms(e.target.checked)}
+              color="secondary"
+            />
+          }
+          label={
+            <Typography variant="body2" color="#FEFCFB">
+              Acepto los <Link href="/terms-and-conditions" color="inherit">términos y condiciones</Link>
+            </Typography>
+          }
+          sx={{ mb: 2 }}
+        />
         <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
           Iniciar sesión
         </Button>
-        <Link href="/register" underline="hover" sx={{ mt: 2 }}>
-          <Typography variant="body2">
+        <Link href="/register" underline="hover" sx={{ mt: 2 }} color='white'>
+          <Typography variant="body2" color='white'>
             ¿No tienes cuenta? Crea una aquí.
           </Typography>
         </Link>
-        <Link href="/social-media" underline="hover">
-          <Typography variant="body2">
+        <Link href="/social-media" underline="hover" color='white'>
+          <Typography variant="body2" color='white'>
             Síguenos en nuestras redes
           </Typography>
         </Link>

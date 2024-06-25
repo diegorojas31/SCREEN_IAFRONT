@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import { RegisterPageComponent } from "../components/RegisterPageComponent";
 import { CardComponent } from "../components/CardComponent";
+import { registeredUsers } from "../helper/data";
 
 interface FormData {
   fullName: string;
@@ -27,8 +28,19 @@ export const RegisterPage = () => {
     priceId: 'price_1PClvFKIMRn2BAKSi1d021vw',
   });
 
+  const [error, setError] = useState<string | null>(null);
+
   // Ir al siguiente paso
   const nextStep = (): void => {
+    // Verificar si el correo ya está registrado
+    const isRegistered = registeredUsers.some(user => user.email === formData.email);
+    
+    if (isRegistered) {
+      setError('El correo ya está registrado. Por favor verifique sus datos');
+      return;
+    }
+
+    setError(null);
     setStep(step + 1);
   };
 
@@ -42,7 +54,7 @@ export const RegisterPage = () => {
     setFormData({ ...formData, [input]: e.target.value });
   };
 
-    const handleSuccessfulPayment = (paymentMethodId: string) => {
+  const handleSuccessfulPayment = (paymentMethodId: string) => {
       // Aquí tienes el paymentMethodId para enviarlo al servidor
       // junto con otros datos de formData si es necesario
       console.log("Payment Method ID:", paymentMethodId);
@@ -59,6 +71,7 @@ export const RegisterPage = () => {
           handleChange={handleChange}
           formData={formData}
           currentStep={step}
+          error={error}
         />
       );
     case 2:

@@ -1,6 +1,6 @@
 import { ChangeEvent, FormEvent, useState } from "react";
 
-import { Box, TextField, Button, Typography, Link, InputAdornment, IconButton } from '@mui/material';
+import { Box, TextField, Button, Typography, Link, InputAdornment, IconButton, Alert } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
@@ -24,11 +24,12 @@ interface RegisterPageComponentProps {
     handleChange: (field: keyof FormData) => (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
     formData: FormData;
     currentStep: number;
+    error: string | null;
 }
 
 const imageUrl = '/assets/dream_TradingCard.jpg';
 
-export const RegisterPageComponent: React.FC<RegisterPageComponentProps>  = ({ nextStep, handleChange, formData, currentStep }) => {
+export const RegisterPageComponent: React.FC<RegisterPageComponentProps>  = ({ nextStep, handleChange, formData, currentStep, error }) => {
   
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const totalSteps = 2;
@@ -61,6 +62,7 @@ export const RegisterPageComponent: React.FC<RegisterPageComponentProps>  = ({ n
                 <Typography variant="h6" sx={{ mb: 2 }}>
                     Crear cuenta
                 </Typography>
+                {error && <Alert severity="error" sx={{mb: 2}}>{error}</Alert>}
                 <TextField
                     label="Nombre completo"
                     variant="outlined"

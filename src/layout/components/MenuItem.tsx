@@ -15,7 +15,7 @@ const menuItems: MenuItem[] = [
   {
     name: "Generación de Código",
     icon: <CodeIcon />,
-    link: "/"
+    link: "/generate-code"
   },
   {
     name: "Suscripciones",
